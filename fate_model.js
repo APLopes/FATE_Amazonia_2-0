@@ -525,7 +525,7 @@ list_biomes.forEach(function(biome){
       Export.table.toDrive({
         collection:recipe,
         description:description,
-        folder:'fire_dyn_SEEG_IPAM',
+        folder:'FATE_SEEG_model_output',
         fileNamePrefix:description,
         fileFormat:'csv',
         // selectors:,
@@ -615,7 +615,7 @@ list_biomes.forEach(function(biome){
       Export.table.toDrive({
         collection:recipe,
         description:description,
-        folder:'fire_dyn_SEEG_IPAM',
+        folder:'FATE_SEEG_model_output',
         fileNamePrefix:description,
         fileFormat:'csv',
         // selectors:,
@@ -750,7 +750,7 @@ list_biomes.forEach(function(biome){
   Export.table.toDrive({
     collection:metadata,
     description:description,
-        folder:'fire_dyn_SEEG_IPAM',
+    folder:'FATE_SEEG_model_output',
     fileNamePrefix:description,
     fileFormat:'csv',
     // selectors:,
