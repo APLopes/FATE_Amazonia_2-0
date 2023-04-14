@@ -10,7 +10,7 @@
 //
 //
 // Created by: Camila Silva, Aline Pontes e Wallace Silva
-// Last edited: 13 Apr 2023
+// Last edited: 14 Apr 2023
 //_______________________________________________________________________________
 // --- --- --- VERSION
 var version = 'v2-1';
@@ -20,7 +20,7 @@ var time_since_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/PRODUTOS_
     annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').selfMask(),
     annual_fire_freq_gte2 = annual_fire.updateMask(frequence_fire.gte(2)).gte(1),
     
-    mask_stable = ee.Image('projects/ee-seeg-brazil/assets/collection_10/v1/2_1_Mask_stable/SEEG_c10_v1_2020').eq(3).selfMask(),
+    mask_stable = ee.Image('projects/mapbiomas-workspace/SEEG/2023/c10/2_0_Mask_stable/SEEG_c10_v_0_29_2020').eq(3).selfMask(),
     
     qcn = ee.ImageCollection('projects/mapbiomas-workspace/SEEG/2022/QCN/QCN_30m_BR_v2_0_1')
       .mosaic(),
