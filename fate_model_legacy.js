@@ -13,12 +13,36 @@
 // Last edited: 13 Apr 2023
 //_______________________________________________________________________________
 // --- --- --- VERSION
-var version = 'v2-1';
+var version = 'v2-1-legacy';
 // --- --- --- ASSETS
 var time_since_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/PRODUTOS_REGIME_DO_FOGO/mapbiomas-fire-collection2-time-after-fire-v1'),
     frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-v1').slice(0,38).divide(100).int(),
-    annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').selfMask(),
-    annual_fire_freq_gte2 = annual_fire.updateMask(frequence_fire.gte(2)).gte(1),
+    annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').selfMask();
+    
+
+// --- SUPPORT DATA LEGACY PROCESS
+var postYearsScars = [
+  2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038
+  ];
+
+postYearsScars.forEach(function(year){
+  annual_fire = annual_fire.addBands(
+    ee.Image().rename('burned_coverage_' + year).uint8()
+    );
+  
+  frequence_fire = frequence_fire.addBands(
+    frequence_fire.select(37).divide(100).int().rename('fire_frequency_1985_' + year)
+    );
+  
+  time_since_fire = time_since_fire.addBands(
+    time_since_fire.select('classification_'+year).add(1).rename('classification_'+(year+1)).uint8()
+    );
+  
+});
+////
+
+
+var annual_fire_freq_gte2 = annual_fire.updateMask(frequence_fire.gte(2)).gte(1),
     
     mask_stable = ee.Image('projects/ee-seeg-brazil/assets/collection_10/v1/2_1_Mask_stable/SEEG_c10_v1_2020').eq(3).selfMask(),
     
@@ -48,7 +72,8 @@ Map.addLayer(annual_fire,{},'annual_fire');
 var years = [
   1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,
   2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,
-  2016,2017,2018,2019,2020,2021,2022
+  2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,
+  2031,2032,2033,2034,2035,2036,2037,2038
 ]; // according to the Mapbiomas fire
 
 // fire.years = c(2000,2006) // when the fire events happened -> os anos do fogo podem ser extraidos da camada anual
@@ -65,7 +90,9 @@ var biome_dict = {
       0.008,        0.006,        0.004,        0.003,        0.002,        0.001,        0.001,        0.001,        0,            
       0,            0,            0,            0,            0,            0,            0,            0,            0,
       0,            0,            0,            0,            0,            0,            0,            0,            0,
-      0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,
     ],
     
     turnover:0.03,
@@ -88,7 +115,9 @@ var biome_dict = {
       0.008,        0.006,        0.004,        0.003,        0.002,        0.001,        0.001,        0.001,        0,            
       0,            0,            0,            0,            0,            0,            0,            0,            0,
       0,            0,            0,            0,            0,            0,            0,            0,            0,
-      0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,
     ],
     
     turnover:0.03,
@@ -110,7 +139,9 @@ var biome_dict = {
       0.008,        0.006,        0.004,        0.003,        0.002,        0.001,        0.001,        0.001,        0,            
       0,            0,            0,            0,            0,            0,            0,            0,            0,
       0,            0,            0,            0,            0,            0,            0,            0,            0,
-      0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,
     ],
     
     turnover:0.03,
@@ -132,7 +163,9 @@ var biome_dict = {
       0.008,        0.006,        0.004,        0.003,        0.002,        0.001,        0.001,        0.001,        0,            
       0,            0,            0,            0,            0,            0,            0,            0,            0,
       0,            0,            0,            0,            0,            0,            0,            0,            0,
-      0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,
     ],
     
     turnover:0.03,
@@ -155,7 +188,9 @@ var biome_dict = {
       0.008,        0.006,        0.004,        0.003,        0.002,        0.001,        0.001,        0.001,        0,            
       0,            0,            0,            0,            0,            0,            0,            0,            0,
       0,            0,            0,            0,            0,            0,            0,            0,            0,
-      0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,
     ],
     
     turnover:0.03,
@@ -177,7 +212,9 @@ var biome_dict = {
       0.008,        0.006,        0.004,        0.003,        0.002,        0.001,        0.001,        0.001,        0,            
       0,            0,            0,            0,            0,            0,            0,            0,            0,
       0,            0,            0,            0,            0,            0,            0,            0,            0,
-      0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,            0,            0,            0,            0,            0,            0,            0,            0,
+      0,
     ],
     
     turnover:0.03,
@@ -214,7 +251,9 @@ list_biomes.forEach(function(biome){
       9,            10,           11,           12,           13,           14,           15,           16,         17,
       18,           19,           20,           21,           22,           23,           24,           25,         26,
       27,           28,           29,           30,           31,           32,           33,           34,         35,
-      36,           37,           38
+      36,           37,           38,           39,           40,           41,           42,           43,         44,
+      45,           46,           47,           48,           49,           50,           51,           52,         53,
+      54,
     ];
     
   var AGBloss_lookup = biome_dict[biome]['AGBloss_lookup'];
@@ -478,17 +517,17 @@ list_biomes.forEach(function(biome){
       Map.addLayer(image,{},description,false);
       
       // - export to asset
-      Export.image.toAsset({
-        image:image,
-        description:description,
-        assetId:address + description,
-        // pyramidingPolicy, dimensions, 
-        region:region,
-        scale:30,
-        // crs, crsTransform, 
-        maxPixels:1e13,
-        // shardSize
-      });
+      // Export.image.toAsset({
+      //   image:image,
+      //   description:description,
+      //   assetId:address + description,
+      //   // pyramidingPolicy, dimensions, 
+      //   region:region,
+      //   scale:30,
+      //   // crs, crsTransform, 
+      //   maxPixels:1e13,
+      //   // shardSize
+      // });
       
       // - convert table export to drive 
       var table =  image
@@ -568,17 +607,17 @@ list_biomes.forEach(function(biome){
       Map.addLayer(image,{},description,false);
       
       // - export to asset
-      Export.image.toAsset({
-        image:image,
-        description:description,
-        assetId:address + description,
-        // pyramidingPolicy, dimensions, 
-        region:region,
-        scale:30,
-        // crs, crsTransform, 
-        maxPixels:1e13,
-        // shardSize
-      });
+      // Export.image.toAsset({
+      //   image:image,
+      //   description:description,
+      //   assetId:address + description,
+      //   // pyramidingPolicy, dimensions, 
+      //   region:region,
+      //   scale:30,
+      //   // crs, crsTransform, 
+      //   maxPixels:1e13,
+      //   // shardSize
+      // });
       
       // - convert table export to drive 
       // - convert table export to drive 
