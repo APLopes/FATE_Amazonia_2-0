@@ -13,7 +13,7 @@
 // Last edited: 13 Apr 2023
 //_______________________________________________________________________________
 // --- --- --- VERSION
-var version = 'v2-1';
+var version = 'v2-1-legacy';
 // --- --- --- ASSETS
 var time_since_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/PRODUTOS_REGIME_DO_FOGO/mapbiomas-fire-collection2-time-after-fire-v1'),
     frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-v1').slice(0,38).divide(100).int(),
@@ -517,17 +517,17 @@ list_biomes.forEach(function(biome){
       Map.addLayer(image,{},description,false);
       
       // - export to asset
-      Export.image.toAsset({
-        image:image,
-        description:description,
-        assetId:address + description,
-        // pyramidingPolicy, dimensions, 
-        region:region,
-        scale:30,
-        // crs, crsTransform, 
-        maxPixels:1e13,
-        // shardSize
-      });
+      // Export.image.toAsset({
+      //   image:image,
+      //   description:description,
+      //   assetId:address + description,
+      //   // pyramidingPolicy, dimensions, 
+      //   region:region,
+      //   scale:30,
+      //   // crs, crsTransform, 
+      //   maxPixels:1e13,
+      //   // shardSize
+      // });
       
       // - convert table export to drive 
       var table =  image
@@ -607,17 +607,17 @@ list_biomes.forEach(function(biome){
       Map.addLayer(image,{},description,false);
       
       // - export to asset
-      Export.image.toAsset({
-        image:image,
-        description:description,
-        assetId:address + description,
-        // pyramidingPolicy, dimensions, 
-        region:region,
-        scale:30,
-        // crs, crsTransform, 
-        maxPixels:1e13,
-        // shardSize
-      });
+      // Export.image.toAsset({
+      //   image:image,
+      //   description:description,
+      //   assetId:address + description,
+      //   // pyramidingPolicy, dimensions, 
+      //   region:region,
+      //   scale:30,
+      //   // crs, crsTransform, 
+      //   maxPixels:1e13,
+      //   // shardSize
+      // });
       
       // - convert table export to drive 
       // - convert table export to drive 
