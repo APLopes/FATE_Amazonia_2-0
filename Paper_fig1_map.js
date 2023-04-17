@@ -1,7 +1,7 @@
 //V2 Script to check regeneration in the stable mask and calculate deforested forests which were previously burned
 //This script generates results for figure 1 of our paper
 //Authors: Camila Silva, Wallace Silva, Aline Pontes
-//Last edit: 5th Jan 2023
+//Last edit: 16 Apr 2023
 
 
 
@@ -218,16 +218,15 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
     scale:30, 
   }) 
     
-  print(burn_desf_area, 'ysf_desf_area')
+  // print(burn_desf_area, 'ysf_desf_area')
   // Map.addLayer(burn_desf_area, {bands: 'classification_2019', palette: ['black']}, "burn_desf_area")  
   
   
-  function exporting_relational_table(image,index){
+  function exporting_relational_table (image,index){
     image.bandNames().evaluate(function(bandnames){
-        
-      bandnames
-      .forEach(function(bandname){  
-        var table = ee.FeatureCollection(
+      var table = bandnames
+      .map(function(bandname){  
+        return  ee.FeatureCollection(
           ee.List(
             ee.Image.pixelArea().divide(1e6)
             .addBands(image.select(bandname))
@@ -250,18 +249,16 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
               .set(ee.String(index),obj.get(bandname));
           })
         );
+      });
       
-      // print(index,bandname.slice(-4),table.limit(10));
-      
+      table = ee.FeatureCollection(table).flatten();
         Export.table.toDrive({
           collection:  table,
-          description : 'SEEG-' +index + '_' +  bandname.slice(-4),
+          description : 'SEEG-' +index,
           folder:'FATE_SEEG_model_output',
-          fileNamePrefix: index + '_' +  bandname.slice(-4),
+          fileNamePrefix: index,
           fileFormat:'CSV' ,
         });
-        
-      });
     });    
   }
   
@@ -284,12 +281,13 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   
   
   // frequencia do fogo em florestas estaveis em 2020
-  var freq_std = frequence_fire.slice(5,36).updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2020_classification_2020')) 
+  var freq_std = frequence_fire.slice(6,38).updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2020_classification_2020')) 
+  print('freq_std',freq_std)
   exporting_relational_table(freq_std,'freq_std');
   
   
   //create area burned forest deforested with frequency information
-  var freq_desf = frequence_fire.slice(4,35).updateMask(ysf_desf) 
+  var freq_desf = frequence_fire.slice(6,38).updateMask(ysf_desf) 
   // print(freq_desf_area, "freq_desf_area")
   // Map.addLayer(freq_desf_area, {bands: 'fire_frequency_1985_2019', palette:['red']}, "freq_desf_area")
   
