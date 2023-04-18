@@ -10,15 +10,17 @@
 //
 //
 // Created by: Camila Silva, Aline Pontes e Wallace Silva
-// Last edited: 13 Apr 2023
+// Last edited: 14 Apr 2023
 //_______________________________________________________________________________
+// --- --- --- VERSION
+var version = 'v2-1';
 // --- --- --- ASSETS
 var time_since_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/PRODUTOS_REGIME_DO_FOGO/mapbiomas-fire-collection2-time-after-fire-v1'),
-    frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').slice(0,38).divide(100).int(),
+    frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-v1').slice(0,38).divide(100).int(),
     annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').selfMask(),
     annual_fire_freq_gte2 = annual_fire.updateMask(frequence_fire.gte(2)).gte(1),
     
-    mask_stable = ee.Image('projects/ee-seeg-brazil/assets/collection_10/v1/2_1_Mask_stable/SEEG_c10_v1_2020').eq(3).selfMask(),
+    mask_stable = ee.Image('projects/mapbiomas-workspace/SEEG/2023/c10/2_0_Mask_stable/SEEG_c10_v_0_29_2020').eq(3).selfMask(),
     
     qcn = ee.ImageCollection('projects/mapbiomas-workspace/SEEG/2022/QCN/QCN_30m_BR_v2_0_1')
       .mosaic(),
@@ -201,11 +203,11 @@ var list_biomes = [
 
 list_biomes.forEach(function(biome){
 
-// --- geometry for export
-var featureCollection = biomas
-  .filter(ee.Filter.inList('Bioma',biome_dict[biome]['string_list']));
-var maskRegion = ee.Image(1).paint(featureCollection).neq(1);
-var region = featureCollection.geometry().bounds();
+  // --- geometry for export
+  var featureCollection = biomas
+    .filter(ee.Filter.inList('Bioma',biome_dict[biome]['string_list']));
+  var maskRegion = ee.Image(1).paint(featureCollection).neq(1);
+  var region = featureCollection.geometry().bounds();
 
   var tsfValues = [
       0,            1,            2,            3,            4,            5,            6,            7,          8,
@@ -433,12 +435,6 @@ var region = featureCollection.geometry().bounds();
   
   var NOX_g_ha = fAGNcomb.multiply(2000).multiply(1.6); // result in g NOX per hectare
   
-  var properties = {
-    date_create:ee.Date(Date.now()).format('y-M-d'),
-    source:'FATE_SEEG',
-    theme:'Forest fire emissions',
-  };
-  
   var lists_gases_non_co2 = [
     [CO2_g_ha,'CO2_g_ha_comb_read_warning','ATENÇÃO: Essa é a emissão bruta da combustão e ja foi incluida no balanço (emissão liquida por combustão, decomposição e crescimento). Não somar com a camada de CO2 proveniente do balanço, para não gerar dupla contagem.'], // ATENÇÃO: Não somar com a camada de CO2 proveniente do balanço, pois pode gerar dupla contagem. 
     [CO_g_ha,'CO_g_ha_comb'],
@@ -450,14 +446,22 @@ var region = featureCollection.geometry().bounds();
   lists_gases_non_co2.forEach(function(list){
     var image = list[0];
     var name = list[1];
-    
-    var version = 'v2-1';
-    var newProps = properties;
-    newProps.version = version;
-    newProps.unit = list[1];
+    var split = name.split('_');
+
+    // CH4_g_ha_comb
+    // g CH4 ha-1
+    var newProps = {
+      date_create:ee.Date(Date.now()).format('y-M-d'),
+      source:'FATE_SEEG',
+      theme:'Forest fire emissions',
+      version: version,
+      unit: 'g ' + split[0] + ' ha-1' 
+    };
     
     if (list[2] !== undefined){
       newProps.warning = list[2];
+    } else {
+      delete newProps.warning;
     }
     
     image.bandNames().evaluate(function(oldBands){
@@ -498,12 +502,30 @@ var region = featureCollection.geometry().bounds();
           // tileScale:
         });
       
-      // print(table.limit(2),table)
+      var recipe = ee.FeatureCollection([]);
+      // 1000e4 // combustão
+      // 1000e2 // balanço
+      newBands.forEach(function(newBand){
+        var year = newBand.slice(-4);
+        
+        var newFeat = ee.Feature(null)
+          .set({
+            Biome:biome,
+            GHG:name.split('_')[0],
+            Year:year,
+            Emissions_Tg:table.first().getNumber(newBand).divide(1e12) // 1e12 transforma grama para teragrama
+          });
+        
+        recipe = recipe.merge(ee.FeatureCollection([newFeat]));
+        
+      });
       
+      // print(table.limit(2),table);
+      description = description.replace('g_ha','Tg');
       Export.table.toDrive({
-        collection:table,
+        collection:recipe,
         description:description,
-        folder:'fire_dyn_SEEG_IPAM',
+        folder:'FATE_SEEG_model_output',
         fileNamePrefix:description,
         fileFormat:'csv',
         // selectors:,
@@ -525,19 +547,23 @@ var region = featureCollection.geometry().bounds();
   CO2_Mg_ha.bandNames().evaluate(function(oldBands){
     var newBands = oldBands.map(function(band){ return 'CO2_Mg_ha' + band.slice(-5)});
     
-    var version = 'v2-1';
-    var description = biome + '-CO2_Mg_ha-' + version;
+    var name = 'CO2_Mg_ha_balance';
+    var description = biome + '-'+ name + '-' + version;
     var address = 'projects/mapbiomas-workspace/SEEG/2022/FOGO/FLORESTA/';
     
-    var newProps = properties;
-    newProps.version = version;
-    newProps.unit = 'CO2_Mg_ha';
-  
+    var newProps = {
+      date_create:ee.Date(Date.now()).format('y-M-d'),
+      source:'FATE_SEEG',
+      theme:'Forest fire emissions',
+      version: version,
+      unit: 'Mg CO2 ha-1'
+    };
+
     
     var image = CO2_Mg_ha.select(oldBands,newBands)
       .float()
-      .multiply(-1); // convertendo para emissões
-    
+      .multiply(-1) // convertendo para emissões
+      .set(newProps)
       
       Map.addLayer(image,{},description,false);
       
@@ -566,11 +592,30 @@ var region = featureCollection.geometry().bounds();
           // crsTransform:,
           // tileScale:
         });
-  
+      
+        
+      var recipe = ee.FeatureCollection([]);
+
+      newBands.forEach(function(newBand){
+        var year = newBand.slice(-4);
+        
+        var newFeat = ee.Feature(null)
+          .set({
+            Biome:biome,
+            GHG:name.split('_')[0],
+            Year:year,
+            Emissions_Tg:table.first().getNumber(newBand).divide(1e6) // 1e6 transforma megagrama para teragrama
+          });
+        
+        recipe = recipe.merge(ee.FeatureCollection([newFeat]));
+        
+      });
+      
+      description = description.replace('Mg_ha','Tg');
       Export.table.toDrive({
-        collection:table,
+        collection:recipe,
         description:description,
-        folder:'fire_dyn_SEEG_IPAM',
+        folder:'FATE_SEEG_model_output',
         fileNamePrefix:description,
         fileFormat:'csv',
         // selectors:,
@@ -578,5 +623,138 @@ var region = featureCollection.geometry().bounds();
       });
   
   });
-
-})
+  
+  // --- --- --- METADATA TABLE
+  var metadata = ee.FeatureCollection([
+      ee.Feature(null)
+        .set({
+          METADATA:'FATE Model v2-1 - Integrated model for GHG emissions from forest fires in primary forests',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Emissions from fires not associated with deforestation',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'By INPE/IPAM',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Headers',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Biome: ' + biome,
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'GHG:	Greenhouse gas of interest',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Year:	Year of reference',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Emissions_Tg: GHG emissions (in Tg)',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Observations',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Input spatial products: Mapbiomas Fire collection 2 (1986-2022), SEEG 10 forest mask stable, and Rectified QCN carbon stocks',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Biophysical processes:  Combustion, tree mortality, tree regeneration and decomposition',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Other details',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Forest mask stable is the total standing forest at the end of the time series',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Rectified QCN carbon stocks are maps corrected by Mapbiomas vegetation classes',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'Output products',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:biome+'-CO2_Tg_comb_read_warning-v2-1: Gross CO2 emissions from combustion',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:biome+'-CO_Tg_comb-v2-1: CO emissions from combustion',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:biome+'-CH4_Tg_comb-v2-1: CH4 emissions from combustion',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:biome+'-N2O_Tg_comb-v2-1: N2O emissions from combustion',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:biome+'-NOX_Tg_comb-v2-1: NOX emissions from combustion',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:biome+'-CO2_Tg_balance-v2-1: Net CO2 emissions from combustion, decomposition and regeneration',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'',
+        }),
+        
+      ee.Feature(null)
+        .set({
+          METADATA:'Author(s):	Dra. Camila Silva, Dra. Aline Pontes Lopes, and Wallace Vieira da Silva',
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:ee.String('Date (y-m-d): ').cat(ee.Date(Date.now()).format('y-M-d')),
+        }),
+      ee.Feature(null)
+        .set({
+          METADATA:'For further clarifications, please contact: camila.silva@ipam.org.br; alineplopes@gmail.com',
+        }),
+    ]);
+  
+  var description = biome + '-Fate_model_output_metadata-' + version;
+  
+  Export.table.toDrive({
+    collection:metadata,
+    description:description,
+    folder:'FATE_SEEG_model_output',
+    fileNamePrefix:description,
+    fileFormat:'csv',
+    // selectors:,
+    // maxVertices:
+  });
+  
+});
