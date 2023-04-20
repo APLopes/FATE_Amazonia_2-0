@@ -1,25 +1,24 @@
 //V2 Script to check regeneration in the stable mask and calculate deforested forests which were previously burned
 //This script generates results for figure 1 of our paper
 //Authors: Camila Silva, Wallace Silva, Aline Pontes
-//Last edit: 16 Apr 2023
-
-
+//Last edit: 20 Apr 2023
 
 
 //Load and create auxiliar data_____________________________________________________________________________
 
-var desmat = ee.Image ('projects/mapbiomas-workspace/SEEG/2023/c10/1_1_Temporal_filter_deforestation')
+// Não estamos utilizando os dados de desmatamento e regeneração do SEEG.
+// var desmat = ee.Image ('projects/mapbiomas-workspace/SEEG/2023/c10/1_1_Temporal_filter_deforestation')
 // print (desmat, 'desmat')
 
-var regen = ee.Image('projects/ee-seeg-brazil/assets/collection_9/v1/1_1_Temporal_filter_regeneration')
+// var regen = ee.Image('projects/ee-seeg-brazil/assets/collection_9/v1/1_1_Temporal_filter_regeneration')
 // print(regen, 'regen')
 
 var ysf = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/PRODUTOS_REGIME_DO_FOGO/mapbiomas-fire-collection2-time-after-fire-v1')
-// print(ysf, 'ysf')
+print(ysf, 'ysf')
 // Map.addLayer(ysf, {bands: "classification_2019", palette: 'red'}, "ysf")
 
 var frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-v1').divide(100).int();
-// print(frequence_fire, 'frequence_fire');
+print(frequence_fire, 'frequence_fire');
 //Map.addLayer(frequence_fire, {bands: 'fire_frequency_1985_2019', palette: ['aaff04','ccff00','fff704','ffbc00','ff5f02','ff1d06']}, 'frequence_fire')
 
 
@@ -44,12 +43,12 @@ var biomeBounds = biome.geometry().bounds();
 
 //Load SEEG Mask Stable
 var mask_stable = ee.ImageCollection('projects/mapbiomas-workspace/SEEG/2023/c10/2_0_Mask_stable').toBands().eq(3).selfMask();
-// print(mask_stable, 'mask_stable')
+print(mask_stable, 'mask_stable')
 // Map.addLayer(mask_stable, {bands: 'SEEG_2021_c6_1989_classification_1989',min:0, max:1, palette: ['black']}, 'mask_stable')
 
 // Non-forest Mask
 var non_for = ee.ImageCollection('projects/mapbiomas-workspace/SEEG/2023/c10/2_0_Mask_stable').toBands().neq(3).selfMask().multiply(0);
-// print(non_for, 'non_for')
+print(non_for, 'non_for')
 // Map.addLayer(non_for, {bands: 'SEEG_2021_c6_1989_classification_1989',min:0, max:0, palette: ['red']}, 'non_for')
 
 
@@ -64,27 +63,22 @@ var blend = mask_stable.blend(non_for)
 
 //Isolate initial and final year
 var ms_init= blend.slice(0,-1) //initial_year, primeira a penultima banda
-// print(ms_init, 'ms_init')
+print(ms_init, 'ms_init')
 var ms_final = blend.slice(1) //final_year, segunda a ultima banda
-// print(ms_final, 'ms_final')
+print(ms_final, 'ms_final')
 
 
 //Subtraction between final and initial to map deforestation and regeneration
 var ms_subtr = ms_final.subtract(ms_init)// desmatam=-1; regen=1
-// print(ms_subtr, 'ms_subtr')
+print(ms_subtr, 'ms_subtr')
 // Map.addLayer(ms_subtr, {min:-1, max:1}, 'ms_subtr')
 
 
 // Create a regeneration mask by selecting pixels = 1
 var reg = ms_subtr.eq(1).selfMask();
-// print(reg, 'reg')
+print(reg, 'reg')
 // Map.addLayer(reg, {},'reg')
 
-
-//Calculate the area of regeneration pixels (inconsistency in the data) and export results in a table
-var bioma = 'amazonia';
-var biome = ee.FeatureCollection('projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil')
-.filter(ee.Filter.eq('Bioma','Amazônia'))
 
 reg.bandNames().evaluate(function(bandnames){
 var newbands = bandnames.map(function(bandname){
@@ -142,25 +136,24 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   var desf = subtr.eq(-1).selfMask() // mascara de desmatamento
   print(desf, 'desf')
   // print(ysf.slice(3, -2), 'ysf') 
-  Map.addLayer(desf, {bands:['SEEG_c10_v_0_29_2020_classification_2020'],palette:'008000'},'desf')
+  Map.addLayer(desf, {bands:['SEEG_c10_v_0_29_2021_classification_2021'],palette:'008000'},'desf')
   
   
   //Apply correction to ysf dataset - convert fire age at the year of fire to zero
   var annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1')
-                    .slice(1)
                     .selfMask()
                     .multiply(0)
   print(annual_fire, ysf,'annual_fire')
   Map.addLayer(annual_fire, {bands: 'burned_coverage_2000',palette: 'black'}, 'annual_fire')
   
   
-  var ysf_cor = ysf.slice(0,-1).blend(annual_fire)
+  var ysf_cor = ysf.slice(0,-1).blend(annual_fire.slice(1))
   print(ysf_cor, 'ysf_cor')
   // Map.addLayer(ysf_cor, {bands: 'classification_2020',palette: 'black'}, 'ysf_cor')
   
   
-  //recorte temporal do ysf // reduz para 1990-2020
-  var ysf_adap = ysf_cor.slice(4, -1)
+  //recorte temporal do ysf // reduz para 1989-2020
+  var ysf_adap = ysf_cor.slice(3, -2)
   print(ysf_adap, 'ysf_adap')
   Map.addLayer(ysf_adap, {bands: 'classification_2000', palette:'black'}, 'ysf_adap')
   
@@ -168,7 +161,7 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   //A idade representa a idade no ano seguinte
   //Corrigimos a idade pq o desmatamento eh do ano seguinte (add(1))
   //Ver mascara de desmatamento - foi feito recorte de bandas para que tivesse 1 ano a frente do dado de ysf
-  //recorte do fogo e de 1989 a 2019, e recorte do desmatamento e de 1990 a 2020
+  //recorte do fogo e de 1989 a 2020, e recorte do desmatamento e de 1990 a 2021
   //com uso desse recorte estamos excluindo fogo de desmatamento
   //desmatamento do ano seguinte ao fogo nao e considerado como fogo de desmatamento
   
@@ -199,28 +192,9 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   Map.addLayer(ysf_desf, {bands: 'deforestation_2000', palette:'red'}, 'ysf_desf')
 
 
-
-  // create area of all forests deforested in following year
-  var desf_area = desf.multiply((ee.Image.pixelArea().divide(1e6)))
-  .reduceRegions({
-    reducer:ee.Reducer.sum(), 
-    // collection:ee.FeatureCollection([ee.Feature(biomeBounds)]), 
-    collection:ee.FeatureCollection([ee.Feature(geometry)]), 
-    scale:30, 
-    }) 
-
   // create area of burned forests deforested in the following year
   // considerar deletar gte(1), 
-  var burn_desf_area = ysf_desf.gte(1).multiply((ee.Image.pixelArea().divide(1e6)))
-  .reduceRegions({
-    reducer:ee.Reducer.sum(), 
-    collection:ee.FeatureCollection([ee.Feature(biomeBounds)]), 
-    scale:30, 
-  }) 
-    
-  // print(burn_desf_area, 'ysf_desf_area')
-  // Map.addLayer(burn_desf_area, {bands: 'classification_2019', palette: ['black']}, "burn_desf_area")  
-  
+
   
   function exporting_relational_table (image,index){
     image.bandNames().evaluate(function(bandnames){
@@ -263,33 +237,22 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   }
   
   exporting_relational_table(ysf_desf,'ysf_desf');
+
+  // exporting_relational_table(desf,'desf');
   
-  //create area of all burned forests
-  // var ysf_for_area = ysf_adap.updateMask(mask_stable_cor.slice(0,-1)) //atualiza mascara de floresta para 1989-2019
-  var burn_std_for_area = ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2020_classification_2020')) // ysf_adap e observando somente o que foi estavel a serie inteira
-  .gte(1)
-  .multiply((ee.Image.pixelArea().divide(1e6)))
-  .reduceRegions({
-   reducer:ee.Reducer.sum(), 
-   collection:ee.FeatureCollection([ee.Feature(biomeBounds)]), 
-   scale:30,  
-  })
-  
-  print(burn_std_for_area, 'burn_std_for_area')
-  // Map.addLayer(ysf_adap.updateMask(mask_stable_cor.select('SEEG_2021_c6_2020_classification_2020')), {bands: 'classification_2019', palette: ['red']}, "ysf_for_area")
-  exporting_relational_table(ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2020_classification_2020')),'ysf_std_for_area');
+  exporting_relational_table(ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')),'ysf_std_for_area');
   
   
-  // frequencia do fogo em florestas estaveis em 2020
-  var freq_std = frequence_fire.slice(6,38).updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2020_classification_2020')) 
+  // frequencia do fogo em florestas estaveis em 1990-2021
+  var freq_std = frequence_fire.slice(5,37).updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')) 
   print('freq_std',freq_std)
   exporting_relational_table(freq_std,'freq_std');
   
   
-  //create area burned forest deforested with frequency information
-  var freq_desf = frequence_fire.slice(6,38).updateMask(ysf_desf) 
-  // print(freq_desf_area, "freq_desf_area")
-  // Map.addLayer(freq_desf_area, {bands: 'fire_frequency_1985_2019', palette:['red']}, "freq_desf_area")
+  //create area burned forest deforested with frequency information //1989-2020
+  var freq_desf = frequence_fire.slice(4,36).updateMask(ysf_desf) 
+  print(freq_desf, "freq_desf")
+  // Map.addLayer(freq_desf, {bands: 'fire_frequency_1985_2019', palette:['red']}, "freq_desf")
   
   
   //Mudando o nome das bandas para corresponder com o ano do desmatamento
@@ -304,40 +267,28 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   newNamesF = ee.List(newNamesF)
   // print(newNamesF)
 
-  freq_desf = freq_desf.select(oldBandsF, newNamesF)
+  var freq_desf_cor = freq_desf.select(oldBandsF, newNamesF);
+  print(freq_desf_cor,'freq_desf_cor');
+  exporting_relational_table(freq_desf_cor,'freq_desf');
 
-  exporting_relational_table(freq_desf,'freq_desf');
-
-  // print(freq_desf_area, 'freq_desf_area')
-    
-  //Exporting results as table - total annual area 
   
-  Export.table.toDrive({
-      collection:  burn_desf_area,
-      description : 'SEEG-burn_desf_area', //all forests deforested in following year
-      folder:'FATE_SEEG_model_output',
-      fileNamePrefix: 'burn_desf_area' ,
-      fileFormat:'CSV' ,
-      // selectors, 
-      // maxVertices
-      })
-    
-    
-  Export.table.toDrive({
-    collection:  burn_std_for_area, 
-    description : 'SEEG-burn_std_for_area', //Burned forests deforested in the following year
-    folder:'FATE_SEEG_model_output',
-    fileNamePrefix: 'burn_std_for_area' ,
-    fileFormat:'CSV' ,
-    // selectors, 
-    // maxVertices
-  });
-    
-  //generate grid for visualization 
+  //////////////////////////////////////////////////
+  
+  exporting_relational_table(ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')).gte(1),'burn_std_for_area');
+  exporting_relational_table(ysf_desf.gte(1),'burn_desf_area');
+
+  ////////////////////////////////////////////////////
+  // --- --- --- MAPA
+  var geometryScaleBar = ee.Geometry.Polygon(
+        [[[-55.31203810220982, -14.94992931459384],
+          [-55.31203810220982, -15.506043152308525],
+          [-46.5028912211063, -15.506043152308525],
+          [-46.5028912211063, -14.94992931459384]]], null, false);
+
   var all_ysf_desf = ysf_desf
     .reduce('sum');
     
-  var all_ysf_std_for_area = ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2020_classification_2020'))
+  var all_ysf_std_for_area = ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021'))
     .reduce('sum');
   
   // elementos cartograficos
@@ -362,8 +313,6 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
     .blend(scale);
 
 
-
-
   Map.addLayer(mapa,{},'mapa');
   
     var thumb = ui.Thumbnail({
@@ -385,26 +334,22 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   Map.addLayer(export_image,{palette:['ff0000','0000ff'],min:1,max:2},'mapa tiff');
 
   
-  Export.image.toDrive({
-    image:export_image,
-    description:'mapa-ysf-flo-desf-and-std',
-    folder:'burned_deforested',
-    fileNamePrefix:'mapa-ysf-flo-desf-and-std',
-    // dimensions:,
-    region:biomeBounds,
-    scale:30,
-    // crs:,
-    // crsTransform:,
-    maxPixels:1e13,
-    // shardSize:,
-    // fileDimensions:,
-    // skipEmptyTiles:,
-    fileFormat:'TIFF',
-    // formatOptions:
-  })
+  // Export.image.toDrive({
+  //   image:export_image,
+  //   description:'mapa-ysf-flo-desf-and-std',
+  //   folder:'burned_deforested',
+  //   fileNamePrefix:'mapa-ysf-flo-desf-and-std',
+  //   // dimensions:,
+  //   region:biomeBounds,
+  //   scale:30,
+  //   // crs:,
+  //   // crsTransform:,
+  //   maxPixels:1e13,
+  //   // shardSize:,
+  //   // fileDimensions:,
+  //   // skipEmptyTiles:,
+  //   fileFormat:'TIFF',
+  //   // formatOptions:
+  // })
 });
  
-
-
-
-
