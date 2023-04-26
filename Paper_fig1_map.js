@@ -1,8 +1,7 @@
 //V2 Script to check regeneration in the stable mask and calculate deforested forests which were previously burned
 //This script generates results for figure 1 of our paper
 //Authors: Camila Silva, Wallace Silva, Aline Pontes
-//Last edit: 20 Apr 2023
-
+//Last edit: 24 Apr 2023
 
 //Load and create auxiliar data_____________________________________________________________________________
 
@@ -17,7 +16,7 @@ var ysf = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/PRODUTOS_REGIME_DO_FO
 print(ysf, 'ysf')
 // Map.addLayer(ysf, {bands: "classification_2019", palette: 'red'}, "ysf")
 
-var frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-v1').divide(100).int();
+var frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-coverage-v1').divide(100).int();
 print(frequence_fire, 'frequence_fire');
 //Map.addLayer(frequence_fire, {bands: 'fire_frequency_1985_2019', palette: ['aaff04','ccff00','fff704','ffbc00','ff5f02','ff1d06']}, 'frequence_fire')
 
@@ -192,18 +191,29 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   Map.addLayer(ysf_desf, {bands: 'deforestation_2000', palette:'red'}, 'ysf_desf')
 
 
+
+  // create area of all forests deforested in following year
+  // var desf_area = desf.multiply((ee.Image.pixelArea().divide(1e6)))
+  // .reduceRegions({
+  //   reducer:ee.Reducer.sum(), 
+  //   // collection:ee.FeatureCollection([ee.Feature(biomeBounds)]), 
+  //   collection:ee.FeatureCollection([ee.Feature(geometry)]), 
+  //   scale:30, 
+  //   }) 
+
   // create area of burned forests deforested in the following year
   // considerar deletar gte(1), 
 
   
   function exporting_relational_table (image,index){
+    print('IMAGE',index,image);
     image.bandNames().evaluate(function(bandnames){
       var table = bandnames
       .map(function(bandname){  
         return  ee.FeatureCollection(
           ee.List(
             ee.Image.pixelArea().divide(1e6)
-            .addBands(image.select(bandname))
+            .addBands(image.select(bandname).int16())
             .reduceRegion({
               reducer:ee.Reducer.sum().group(1,bandname),
               geometry:biomeBounds,
@@ -237,8 +247,6 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   }
   
   exporting_relational_table(ysf_desf,'ysf_desf');
-
-  // exporting_relational_table(desf,'desf');
   
   exporting_relational_table(ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')),'ysf_std_for_area');
   
@@ -277,14 +285,8 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   exporting_relational_table(ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')).gte(1),'burn_std_for_area');
   exporting_relational_table(ysf_desf.gte(1),'burn_desf_area');
 
-  ////////////////////////////////////////////////////
-  // --- --- --- MAPA
-  var geometryScaleBar = ee.Geometry.Polygon(
-        [[[-55.31203810220982, -14.94992931459384],
-          [-55.31203810220982, -15.506043152308525],
-          [-46.5028912211063, -15.506043152308525],
-          [-46.5028912211063, -14.94992931459384]]], null, false);
 
+  //generate grid for visualization 
   var all_ysf_desf = ysf_desf
     .reduce('sum');
     
@@ -293,7 +295,11 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   
   // elementos cartograficos
   var style = require('users/gena/packages:style')
-  
+  var geometryScaleBar = ee.Geometry.Polygon(
+        [[[-55.31203810220982, -14.94992931459384],
+          [-55.31203810220982, -15.506043152308525],
+          [-46.5028912211063, -15.506043152308525],
+          [-46.5028912211063, -14.94992931459384]]]);
   var textProperties = { fontSize:16, textColor: '000000', outlineColor: 'ffffff', outlineWidth: 2, outlineOpacity: 0.6 }
   var scale = style.ScaleBar.draw(geometryScaleBar, {
     steps:2, palette: ['101010', 'f5f5f5'], multiplier: 1000, format: '%.0f', units: 'km', text: textProperties
@@ -311,6 +317,8 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
     .blend(statesLine)
     .blend(countriesLine)
     .blend(scale);
+
+
 
 
   Map.addLayer(mapa,{},'mapa');
