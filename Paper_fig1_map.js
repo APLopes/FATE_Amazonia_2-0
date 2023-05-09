@@ -1,7 +1,7 @@
 //V2 Script to check regeneration in the stable mask and calculate deforested forests which were previously burned
 //This script generates results for figure 1 of our paper
 //Authors: Camila Silva, Wallace Silva, Aline Pontes
-//Last edit: 24 Apr 2023
+//Last edit: 09 May 2023
 
 //Load and create auxiliar data_____________________________________________________________________________
 
@@ -150,6 +150,9 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   print(ysf_cor, 'ysf_cor')
   // Map.addLayer(ysf_cor, {bands: 'classification_2020',palette: 'black'}, 'ysf_cor')
   
+  //Recorta com a janela temporal para 1990-2021
+  var ysf_cor_2 = ysf_cor.slice(4,-1);
+  print(ysf_cor_2, "ysf_cor_2");
   
   //recorte temporal do ysf // reduz para 1989-2020
   var ysf_adap = ysf_cor.slice(3, -2)
@@ -209,8 +212,8 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
     print('IMAGE',index,image);
     image.bandNames().evaluate(function(bandnames){
       var table = bandnames
-      .map(function(bandname){  
-        return  ee.FeatureCollection(
+      .forEach(function(bandname){  
+        var table = ee.FeatureCollection(
           ee.List(
             ee.Image.pixelArea().divide(1e6)
             .addBands(image.select(bandname).int16())
@@ -233,22 +236,30 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
               .set(ee.String(index),obj.get(bandname));
           })
         );
-      });
-      
-      table = ee.FeatureCollection(table).flatten();
+        
         Export.table.toDrive({
           collection:  table,
-          description : 'SEEG-' +index,
-          folder:'FATE_SEEG_model_output',
-          fileNamePrefix: index,
+          description : 'SEEG_Fire-' +index+'-'+bandname.slice(-4),
+          folder:'FATE_SEEG_model_outputV2',
+          fileNamePrefix: index+'-'+bandname.slice(-4),
           fileFormat:'CSV' ,
         });
+      });
+      
+    //   table = ee.FeatureCollection(table).flatten();
+    //     Export.table.toDrive({
+    //       collection:  table,
+    //       description : 'SEEG-' +index,
+    //       folder:'FATE_SEEG_model_outputV2',
+    //       fileNamePrefix: index,
+    //       fileFormat:'CSV' ,
+    //     });
     });    
   }
   
   exporting_relational_table(ysf_desf,'ysf_desf');
   
-  exporting_relational_table(ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')),'ysf_std_for_area');
+  exporting_relational_table(ysf_cor_2.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')),'ysf_std_for_area');
   
   
   // frequencia do fogo em florestas estaveis em 1990-2021
@@ -281,8 +292,12 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
 
   
   //////////////////////////////////////////////////
+  //Export of relational tables for burned standing forest and burned and deforested
+  //To generate burned standing we need a ysf mask (ysf_cor_2) for 1990-2021
   
-  exporting_relational_table(ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')).gte(1),'burn_std_for_area');
+  
+  //burned standing forest record all previous and current fires (see gte.(0))
+  exporting_relational_table(ysf_cor_2.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021')).gte(0),'burn_std_for_area');
   exporting_relational_table(ysf_desf.gte(1),'burn_desf_area');
 
 
@@ -290,7 +305,7 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   var all_ysf_desf = ysf_desf
     .reduce('sum');
     
-  var all_ysf_std_for_area = ysf_adap.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021'))
+  var all_ysf_std_for_area = ysf_cor_2.updateMask(mask_stable_cor.select('SEEG_c10_v_0_29_2021_classification_2021'))
     .reduce('sum');
   
   // elementos cartograficos
