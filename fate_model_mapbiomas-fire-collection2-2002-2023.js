@@ -30,12 +30,7 @@ var time_since_fire = ee.Image('projects/ee-seegfiredyn/assets/mapbiomas-fire-co
           var i = ee.Number(current).int();
           
           var year = i.add(2001);
-          // var date = ee.Date(ee.String(year).cat('-01-01'));
-          var img = ee.Algorithms.If({
-            condition:i.eq(0),
-            trueCase:annual_fire.select(0), 
-            falseCase:annual_fire.slice(0,i).gte(1).selfMask().reduce('sum')
-          });
+          var img = annual_fire.slice(0,i.add(1)).gte(1).selfMask().reduce('sum');
           
           img = ee.Image(img).rename(ee.String('frequency_fire_2001_').cat(year));
 
@@ -61,7 +56,7 @@ var time_since_fire = ee.Image('projects/ee-seegfiredyn/assets/mapbiomas-fire-co
 print(time_since_fire,annual_fire,frequence_fire,annual_fire_freq_gte2);
 
 // Map.addLayer(time_since_fire,{},'time_since_fire');
-// Map.addLayer(frequence_fire,{},'frequence_fire');
+Map.addLayer(frequence_fire,{},'frequence_fire');
 Map.addLayer(annual_fire,{},'annual_fire');
 // Map.addLayer(annual_fire_freq_gte2,{},'annual_fire_freq_gte2');
 // Map.addLayer(qcn,{},'qcn')
