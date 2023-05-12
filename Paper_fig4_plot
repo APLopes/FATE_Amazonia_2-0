@@ -198,7 +198,29 @@ png("./figures/Manuscript_Figure5_Main_gases_Tg_20230426.png", width = 20, heigh
 pm
 dev.off()
 
+# queris for the text -----------------------------------------------------------
 
+# total Co2eq emissions 1990-2022
+sum(subset(df.main.fig, Year.num >=1990 & Year.num<=2022)$Emissions_Tg_Co2eq) # 1840.239 Tg
+
+# CO2eq emissions in 2007
+sum(subset(df.main.fig, Year.num == 2007)$Emissions_Tg_Co2eq) # 87.9 Tg year-1
+
+# Co2eq emissions since 2015
+df.query = droplevels(subset(df.main.fig, Year.num >= 2010 & Year.num <= 2022))
+df.query = df.query %>%
+  group_by(Year) %>%
+  summarise(Emissions_Tg_Co2eq = sum(Emissions_Tg_Co2eq))
+# 2010: 93.7 Tg CO2eq
+# 2016: 90.6 Tg CO2eq
+# 2020: 92.3 Tg CO2eq
+# 2022: 124.2 Tg CO2eq
+
+# legacy emissions
+sum(subset(df.main.fig, Year.num >= 2022 )$Emissions_Tg_Co2eq) # 693,6 Tg year-1
+
+
+# saving data ------------------------------------------------------------------
 # export to compare with 2002-2020 models based on the Mapbiomas Fire and MCD64 burned area maps
 save(list = c('df', 'df.main.fig', 'df.ss'), file='./Model_outputs_1986_2022_with_legacy_20230426.Rdata')
 
