@@ -150,7 +150,7 @@ pb = ggplot() +
         plot.title = element_text(size=13, face="bold", hjust = 0, color = 'gray19'),
         legend.position = 'top', legend.direction = "horizontal") +
   labs(x = 'Year', y = '% of cumulated burned standing forest', fill="", alpha="") + 
-  annotate('text', x='1991', y=386000, label = "b", size=7, fontface='bold')
+  annotate('text', x='1991', y=386000, label = "(b)", size=5)
 
 x11(); pb
 
@@ -291,7 +291,7 @@ pc_v2 = ggplot(df.freq_bd_bs_summary, aes(x=year,y=wg_avg_freq, group=status, fi
         plot.title = element_text(size=13, face="bold", hjust = 0, color = 'gray19'),
         legend.position = 'top', legend.direction = "horizontal") +
   labs(x = 'Year', y = "Fire frequency", fill="", color="") +
-  annotate('text', x=1991, y=3.9, label = "c", size=7, fontface='bold')
+  annotate('text', x=1991, y=3.9, label = "(c)", size=5)
 
 x11(); pc_v2 # now both 'burned and deforested' & 'burned and standing'
 
@@ -402,7 +402,7 @@ pd_v2 = ggplot(df.ysf_bd_bs_summary, aes(x=year,y=wg_avg_ysf, group=status, fill
         plot.title = element_text(size=13, face="bold", hjust = 0, color = 'gray19'),
         legend.position = 'top', legend.direction = "horizontal") +
   labs(x = 'Year', y = "Time since last fire (years)", fill="", color="") +
-  annotate('text', x=1991, y=20.8, label = "d", size=7, fontface='bold')
+  annotate('text', x=1991, y=20.8, label = "(d)", size=5)
 
 x11(); pd_v2 # now both 'burned and deforested' & 'burned and standing'
 
@@ -437,7 +437,7 @@ pa = ggplot(null.df) +
   theme_void() +
   theme(legend.position = 'top',legend.direction = 'horizontal') +
   labs(fill='')+
-  annotate('text', x='1991', y=240, label = "a", size=7, fontface='bold') +
+  annotate('text', x='1991', y=240, label = "(a)", size=5) +
   coord_cartesian(ylim=c(1,250))
 
 x11(); pa
