@@ -12,7 +12,7 @@ gc();
 ##
 ## R version 4.1.2
 ##
-## Made by: Aline Pontes Lopes, 10/02/2022, eds 25/05/2022
+## Made by: Aline Pontes Lopes, 10/02/2022, eds 25/05/2022, 23/05/2023
 ##_______________________________________________________________________________
 
 
@@ -352,7 +352,7 @@ cbPal <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D
   AGBstocks.TimePlot <-
     sModel %>%
     ggplot(aes(x=year, y=LeftAGB)) +
-    geom_bar(stat = "identity", position="identity", fill="#009E73",alpha=0.7) + #old color: #68A12B
+    geom_bar(stat = "identity", position="identity", fill='#56B4E9',alpha=0.7) + #old color: #68A12B, "#009E73"
     geom_hline(yintercept = 0) +
     geom_vline(xintercept = fire.years, linetype = "dashed",color = 'gray19') +
     scale_x_continuous(breaks=sModel$year,
@@ -382,7 +382,7 @@ cbPal <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D
   AGNinput.TimePlot <- 
     sModel %>%
     ggplot(aes(x=year, y=AGNinput)) +
-    geom_bar(stat = 'identity', fill = "#D55E00",alpha=0.7) +
+    geom_bar(stat = 'identity', fill = '#56B4E9',alpha=0.7) + # "#D55E00"
     geom_hline(yintercept = 0) +
     geom_vline(xintercept = fire.years, linetype = "dashed",color = 'gray19') +
     scale_x_continuous(breaks=sModel$year,
@@ -411,7 +411,7 @@ cbPal <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D
   AGNcomb.TimePlot <- 
     sModel %>%
     ggplot(aes(x=year, y=AGNcomb)) +
-    geom_bar(stat = 'identity', fill = "#0072B2", alpha=0.7) +
+    geom_bar(stat = 'identity', fill = '#56B4E9', alpha=0.7) +# old:"#0072B2"
     geom_hline(yintercept = 0) +
     geom_vline(xintercept = fire.years, linetype = "dashed",color = 'gray19') +
     scale_x_continuous(breaks=sModel$year,
@@ -440,7 +440,7 @@ cbPal <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D
   AGNdecomp.TimePlot <- 
     sModel %>%
     ggplot(aes(x=year, y=AGNdecomp)) +
-    geom_bar(stat = 'identity', fill = "#56B4E9", alpha = 0.7) +
+    geom_bar(stat = 'identity', fill = '#56B4E9', alpha = 0.7) + #"#56B4E9"
     geom_hline(yintercept = 0) +
     geom_vline(xintercept = fire.years, linetype = "dashed",color = 'gray19') +
     scale_x_continuous(breaks=sModel$year,
@@ -468,7 +468,7 @@ cbPal <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D
   AGNstocks.TimePlot <- 
     sModel %>%
     ggplot(aes(x=year, y=LeftAGN)) +
-    geom_bar(stat = "identity",position="identity",fill='#E69F00',alpha=0.7) +  #old: #F7903B
+    geom_bar(stat = "identity",position="identity",fill='#56B4E9',alpha=0.7) +  #old: #F7903B, '#E69F00'
     geom_hline(yintercept = 0) +
     geom_vline(xintercept = fire.years, linetype = "dashed",color = 'gray19') +
     scale_x_continuous(breaks=sModel$year,
@@ -497,7 +497,7 @@ cbPal <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D
 
   FCBalance.TimePlot = sModel %>%
     ggplot() +
-    geom_bar(aes(x=year, y = CBalance),stat = "identity", alpha=0.9, fill = "#CC79A7") +  #old: #B98DE2
+    geom_bar(aes(x=year, y = CBalance),stat = "identity", alpha=0.7, fill = '#56B4E9') +  #old: #B98DE2, #CC79A7
     geom_hline(yintercept = 0) +
     geom_vline(xintercept = fire.years, linetype = "dashed",color = 'gray19') +
     scale_x_continuous(breaks=sModel$year,
@@ -527,7 +527,7 @@ cbPal <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D
 
 
 # save figure
-png("./figures/ManuscriptFigure4_SinglePoint_3fires_20220525.png",
+png("./figures/ManuscriptFigure4_SinglePoint_3fires_20230523.png",
      width = 16, height = 22, units = 'cm', res = 300)
 timeline.plots = ggarrange(AGBstocks.TimePlot,
                            AGNinput.TimePlot,
@@ -538,16 +538,4 @@ timeline.plots = ggarrange(AGBstocks.TimePlot,
                            ncol = 1)
 dev.off()
 
-
-# #RCGI poster
-# 
-# png("./figures/ManuscriptFigure4_SinglePoint_3fires_20220525_RCGIposter.png",
-#     width = 18, height = 16, units = 'cm', res = 300)
-# timeline.plots = ggarrange(AGBstocks.TimePlot,
-#                            AGNcomb.TimePlot,
-#                            AGNinput.TimePlot,
-#                            AGNdecomp.TimePlot,
-#                            FCBalance.TimePlot,
-#                            ncol = 1)
-# dev.off()
 
