@@ -129,7 +129,7 @@ ps
 dev.off()
 
 # exporting table
-write.xlsx(df.ss, './Tables/SM_Figure6_data.xlsx')
+write.xlsx(df.ss, './Tables/MBc2_each_gas_emissions_1986-2022.xlsx')
 
 
 
