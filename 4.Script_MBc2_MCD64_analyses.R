@@ -285,7 +285,7 @@ ps3 = ggplot(df2.CO2eq.sum.cum, aes(Year, Emissions_Tg_Co2eq_cum, group=Base, fi
 x11(); ps3
 
 
-png("./Figures/SM_Figure7.png", width = 20, height = 15, units = 'cm', res = 400)
+png("./Figures/SM_Figure9.png", width = 20, height = 15, units = 'cm', res = 400)
 ggarrange(ps2,ps3,ncol=1)
 dev.off()
 

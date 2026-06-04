@@ -101,7 +101,7 @@ df$total.Closs.pc = df$total.Closs/sum(stocks[[2]],stocks[[3]])*100
 
 # heatmap plot
 
-png("./Figures/SM_Figure8.png", 
+png("./Figures/SM_Figure12.png", 
     width = 18, height = 7, units = 'cm', res = 400) 
 
 ggplot(df, aes(interval, freq, fill=total.Closs.pc)) +
