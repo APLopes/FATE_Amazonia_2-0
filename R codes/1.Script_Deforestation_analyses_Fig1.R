@@ -1,18 +1,27 @@
 
-##_____________________________________________________________________________
-## SEEG Fogo 
-## Desforestation of burned forests 
+## ============================================================================
+## FATE-SEEG Fire manuscript
+## Figure 1 – Deforestation of Burned Forests
 ##
-## Load spreadsheets from Google Earth, join, and plot
+## Description:
+## Processes Google Earth Engine outputs to quantify and analyze the
+## deforestation of previously burned forests in the Brazilian Amazon.
+## Generates datasets and visualizations used in Figure 1.
 ##
-## Made by: Aline Pontes Lopes, 25/05/2022, edits 23/12/2022, 10/01/2023, 
-## 18/04/2023, 11/05/2023, 24/03/2024 and 06/07/2025
-## cleaned script, new GEE data from 09/05/2023
+## Inputs:
+## - Annual burned and deforested forest area
+## - Burn frequency datasets
+## - Time-since-last-fire datasets
 ##
-## APL: version called:
-## "SEEGFire_AM_Burnedforests_deforestation_analyses_20250706.R"
+## Outputs:
+## - Figure 1 (main text)
+## - Source data tables used in the figure
 ##
-##_______________________________________________________________________________
+## Author:
+## Aline Pontes Lopes
+##
+## Public repository version.
+## ============================================================================
 
 
 library(openxlsx)
@@ -21,10 +30,6 @@ library(reshape2)
 library(tidyr)
 library(ggplot2)
 library(scales)
-library(raster)
-library(ggsn)
-library(ggthemes)
-library(ggpmisc)
 library(egg)
 library(svglite)
 
@@ -39,7 +44,7 @@ library(svglite)
 ## Box b - Burned and deforested x all deforested forests ----------------------
 
 # burned and deforested, each-year deforestation area (Km2) ----
-path = './Data/Desm_freq_queima/Burnedforests_deforestation_20230511/burn_desf_area-YYYY'
+path = './Data/Desf_Fire_freq/burn_desf_area-YYYY'
 
 # read all sheets at once and organize 
 
@@ -48,7 +53,6 @@ df.list = list();
 
 file.list <- list.files(path = path, full.names = TRUE, recursive = TRUE, pattern = "*.csv")
 df.list <- sapply(file.list, function(x) read.csv(file = x, header = TRUE), simplify = FALSE)
-df.list[[10]]
 df_bd = bind_rows(df.list)
 rm(path, df.list, file.list)
 
@@ -59,13 +63,9 @@ df_bd$year = as.numeric(df_bd$year)
 # cumulative data
 df_bd = df_bd %>% mutate(cum_burn_defor = cumsum(annual_burn_defor))
 
-# simple plot to check
-# ggplot(df_bd, aes(x=year,y=annual_burn_defor))+ geom_path()
-# ggplot(df_bd, aes(x=year,y=cum_burn_defor))+ geom_path()
-
 
 # burned and standing, cumulative burned area (Km2)
-path = './Data/Desm_freq_queima/Burnedforests_deforestation_20230511/burn_std_for_area-YYYY'
+path = './Data/Desf_Fire_freq/burn_std_for_area-YYYY'
 
 # read all sheets at once and organize 
 
@@ -74,7 +74,6 @@ df.list = list();
 
 file.list <- list.files(path = path, full.names = TRUE, recursive = TRUE, pattern = "*.csv")
 df.list <- sapply(file.list, function(x) read.csv(file = x, header = TRUE), simplify = FALSE)
-df.list[[10]]
 df_bs = bind_rows(df.list)
 rm(path, df.list, file.list)
 
@@ -82,8 +81,6 @@ df_bs = df_bs[,c(4,2)]
 names(df_bs)[2] = 'cum_burn_standing'   # It is already standing.
 df_bs$year = as.numeric(df_bs$year)
 
-# simple plot to check
-# x11(); ggplot(df_bs, aes(x=year,y=cum_burn_standing))+ geom_path()
 
 
 ## Box b - 2nd axis - Cumulated burned area x cumulated burned deforested area
@@ -94,17 +91,12 @@ df = df_bd
 df$cum_burn_standing = df_bs$cum_burn_standing
 
 df_boxb = melt(df[,c(1,3,4)], id='year')
-head(df_boxb)
 names(df_boxb) = c('Year','Status','Area')
 df_boxb$Year = as.factor(df_boxb$Year)
 
 df_boxb$Status = factor(df_boxb$Status, levels = c("cum_burn_standing","cum_burn_defor"),
                          labels = c('burned and remain standing', 'burned and later deforested'))
 rm(df)
-
-# export data
-# write.csv(df_bd, './Data/Desm_freq_queima/Burnedforests_deforestation_20230511/burned_deforested_areas.csv')
-# write.csv(df_bs, './Data/Desm_freq_queima/Burnedforests_deforestation_20230511/burned_standing_areas.csv')
 
 
 ## -- Box b - 1st axis - Burned forests: % standing x % deforested
@@ -113,15 +105,12 @@ df_boxb = df_boxb %>%
   group_by(Year) %>%
   mutate(area_perc = Area/sum(Area) * 100)
 
-#df_boxb$Status = factor(df_boxb$Status, levels = rev(levels(df_boxb$Status)))
-
 df_boxb = as.data.frame(df_boxb)
 
 df_boxb$area_perc_scaled = df_boxb$area_perc*4000                            
 df_boxb_line = subset(df_boxb, Status == "burned and remain standing")
 df_boxb_line = droplevels(df_boxb_line)
 
-cbPal <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 ## Plotting Box b
 
@@ -135,7 +124,7 @@ pb = ggplot() +
                      breaks = c(0,100000,200000,300000,400000),
                      labels = c(0,100000,200000,300000,400000)/4000,
                      sec.axis = sec_axis(~ ./1000 , name = expression("Cumulated burned forest area (x1000 km"^{2}*")"))) +
-  scale_fill_manual(values = c('#56B4E9','#CC79A7'), drop=T) + # rev(hue_pal()(2))) =
+  scale_fill_manual(values = c('#56B4E9','#CC79A7'), drop=T) +
   scale_alpha_manual(values=c(0.6,0.8)) +
   theme_minimal() +
   theme(axis.title = element_text(size = 11, color = 'gray19'),
@@ -160,7 +149,7 @@ write.xlsx(df_boxb_line, "./Tables/Figure1_boxb_axis1_data.xlsx")
 write.xlsx(df_boxb, "./Tables/Figure1_boxb_axis2_data.xlsx")
 
 
-## queries for the text
+# Manuscript statistics ----
 
 # total forest area, burned at least once
 sum(subset(df_boxb, Year == '2021')$Area) # ~336700 km2
@@ -176,10 +165,10 @@ range(subset(df_boxb, Status == 'burned and remain standing')[(length(levels(df_
 subset(df_boxb, Year == '2021' & Status == 'burned and remain standing')$Area #187900 km2
 
 
-## Box c - Fire frequency, standing vs. deforested ------------------------------------
+## Box c - Fire frequency, standing vs. deforested -----------------------------
 
 # burn frequency when deforested ----
-path = './Data/Desm_freq_queima/Burnedforests_deforestation_20230511/freq_desf-YYYY'
+path = './Data/Desf_Fire_freq/freq_desf-YYYY'
 
 # read all sheets at once and organize 
 
@@ -188,7 +177,6 @@ df.list = list();
 
 file.list <- list.files(path = path, full.names = TRUE, recursive = TRUE, pattern = "*.csv")
 df.list <- sapply(file.list, function(x) read.csv(file = x, header = TRUE), simplify = FALSE)
-df.list[[10]]
 df3_desf_freq = bind_rows(df.list)
 rm(path, df.list, file.list)
 
@@ -239,7 +227,7 @@ df3_desf_freq_summary$sd_lo = df3_desf_freq_summary$wg_avg_freq - df3_desf_freq_
 
 # now adding fire frequency for standing forests ----    
 
-path = './Data/Desm_freq_queima/Burnedforests_deforestation_20230511/freq_std-YYYY'
+path = './Data/Desf_Fire_freq/freq_std-YYYY'
 
 # read all sheets at once and organize 
 
@@ -248,7 +236,6 @@ df.list = list();
 
 file.list <- list.files(path = path, full.names = TRUE, recursive = TRUE, pattern = "*.csv")
 df.list <- sapply(file.list, function(x) read.csv(file = x, header = TRUE), simplify = FALSE)
-df.list[[10]]
 df4_std_freq = bind_rows(df.list)
 rm(path, df.list, file.list)
 
@@ -303,14 +290,13 @@ pc_v2 = ggplot(df.freq_bd_bs_summary, aes(x=year,y=wg_avg_freq, group=status, fi
 x11(); pc_v2 # now both 'burned and later deforested' & 'burned and remain standing'
 
 # exporting table
-
 write.xlsx(df.freq_bd_bs_summary, "./Tables/Figure1_boxc_data.xlsx")
 
 
 
 ## Box d - Year since the last fire when deforested ----------------------------
 
-path = './Data/Desm_freq_queima/Burnedforests_deforestation_20230511/ysf_desf-YYYY'
+path = './Data/Desf_Fire_freq/ysf_desf-YYYY'
 
 # read all sheets at once and organize 
 
@@ -319,7 +305,6 @@ df.list = list();
 
 file.list <- list.files(path = path, full.names = TRUE, recursive = TRUE, pattern = "*.csv")
 df.list <- sapply(file.list, function(x) read.csv(file = x, header = TRUE), simplify = FALSE)
-df.list[[10]]
 df5_desf_ysf = bind_rows(df.list)
 rm(path, df.list, file.list)
 
@@ -347,7 +332,7 @@ df5_desf_ysf_summary$sd_lo = ifelse(df5_desf_ysf_summary$sd_lo < 0, 0, df5_desf_
 
 # now adding ysf for standing forests ----
 
-path = './Data/Desm_freq_queima/Burnedforests_deforestation_20230511/ysf_std_for_area-YYYY'
+path = './Data/Desf_Fire_freq/ysf_std_for_area-YYYY'
 
 # read all sheets at once and organize 
 
@@ -356,7 +341,6 @@ df.list = list();
 
 file.list <- list.files(path = path, full.names = TRUE, recursive = TRUE, pattern = "*.csv")
 df.list <- sapply(file.list, function(x) read.csv(file = x, header = TRUE), simplify = FALSE)
-df.list[[10]]
 df6_std_ysf = bind_rows(df.list)
 rm(path, df.list, file.list)
 
@@ -442,7 +426,6 @@ null.df$status = factor(null.df$status,
                         levels = c('burned and remain standing','burned and later deforested'))
 null.df$year = as.factor(null.df$year)
 
-#colors <- c('burned and remain standing' = '#145CE1', 'burned and later deforested' = '#D56082')
 colors <- c('burned and remain standing' = '#0000ff', 'burned and later deforested' = '#ff0000')
 
 pa = ggplot(null.df) +
@@ -463,117 +446,8 @@ png("./Figures/Figure1.png",
 ggarrange(pa, pb, pc_v2, pd_v2, ncol = 2, nrow = 2, heights = c(2,2))
 dev.off()
 
-# as .svg
-img = ggarrange(pa, pb, pc_v2, pd_v2, ncol = 2, nrow = 2, heights = c(2,2))
-ggsave(file="./figures/Figure1.svg", 
-       plot=img, width = 25, height = 19.5, units = 'cm', dpi = 400)
+# # as .svg
+# img = ggarrange(pa, pb, pc_v2, pd_v2, ncol = 2, nrow = 2, heights = c(2,2))
+# ggsave(file="./figures/Figure1.svg", 
+#        plot=img, width = 25, height = 19.5, units = 'cm', dpi = 400)
 
-
-
-## Supporting Material - SM Figure 1 -------------------------------------------
-
-# Fire frequency when deforested - stacked bar plot
-
-# deforested --------
-
-df3_desf_freq_smfig = df3_desf_freq
-df3_desf_freq_smfig$freq_groups = ifelse(as.numeric(df3_desf_freq_smfig$freq_desf) > 4, 
-                                         'gt4', df3_desf_freq_smfig$freq_desf)  
-df3_desf_freq_smfig$freq_groups = as.factor(df3_desf_freq_smfig$freq_groups)  
-
-df3_desf_fq_smf_summary = df3_desf_freq_smfig %>%   #AQUI
-  group_by(year, freq_groups) %>%
-  summarise(total_area = sum(area_km2)) %>%
-  mutate(perc_burned = total_area/sum(total_area)*100)
-
-df3_desf_fq_smf_summary = as.data.frame(df3_desf_fq_smf_summary)
-
-df3_desf_fq_smf_summary$freq_groups = factor(df3_desf_fq_smf_summary$freq_groups, 
-                                      levels = c("1","2","3","4","gt4"),
-                                      labels = c("1","2","3","4",">4"))
-
-pSM = ggplot(df3_desf_fq_smf_summary) +
-  geom_col(aes(x=year, y=perc_burned, fill=freq_groups), alpha=0.8) +
-  geom_hline(yintercept = 0) +
-  scale_y_continuous(expand = c(0,0)) +
-  #scale_fill_manual(values = viridis_pal()(5)) +
-  #scale_fill_manual(values = rev(c('#93cef0','#5db6ea','#1c94d9','#177bb5','#0e4a6c'))) + 
-  scale_fill_manual(values = c('#65294b', '#933d6c', '#cc79a7', '#f2bad9', '#f9dced')) + 
-  theme_minimal() +
-  theme(axis.title = element_text(size = 11, color = 'gray19'),
-        axis.line = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.text.y = element_text(size = 11, color = 'gray19'),
-        axis.text.x = element_text(size = 8, color = 'gray19', angle=90,hjust=0.95,vjust=0.5),
-        plot.title = element_text(size=13, face="bold", hjust = 0, color = 'gray19'),
-        legend.position = 'bottom', legend.direction = "horizontal") +
-  labs(x = 'Year', y = '% of annual burned deforested area', fill="Fire frequency") +
-  annotate('text', x=1, y=110, label = "(b)", size=5) +
-  coord_cartesian(clip='off')
-
-x11(); pSM
-
-# query
-
-# % of deforested forests burned multiple times
-sum(subset(df3_desf_fq_smf_summary, year=='2021')$perc_burned[2:5]) # 45.4%
-
-
-# standing ------
-
-df4_std_freq_smfig = df4_std_freq
-df4_std_freq_smfig$freq_groups = ifelse(as.numeric(df4_std_freq_smfig$freq_std) > 4, 'gt4', df4_std_freq_smfig$freq_std)  
-df4_std_freq_smfig$freq_groups = as.factor(df4_std_freq_smfig$freq_groups)  
-
-df4_std_fq_smf_summary = df4_std_freq_smfig %>%   #AQUI
-  group_by(year, freq_groups) %>%
-  summarise(total_area = sum(area_km2)) %>%
-  mutate(perc_burned = total_area/sum(total_area)*100)
-
-df4_std_fq_smf_summary = as.data.frame(df4_std_fq_smf_summary)
-
-df4_std_fq_smf_summary$freq_groups = factor(df4_std_fq_smf_summary$freq_groups, 
-                                             levels = c("1","2","3","4","gt4"),
-                                             labels = c("1","2","3","4",">4"))
-
-pSM2 = ggplot(df4_std_fq_smf_summary) +
-  geom_col(aes(x=year, y=perc_burned, fill=freq_groups), alpha=0.8) +
-  geom_hline(yintercept = 0) +
-  scale_y_continuous(expand = c(0,0)) +
-  #scale_fill_manual(values = viridis_pal()(5)) +
-  scale_fill_manual(values = rev(c('#93cef0','#5db6ea','#1c94d9','#177bb5','#0e4a6c'))) + 
-  #scale_fill_manual(values = c('#65294b', '#933d6c', '#cc79a7', '#f2bad9', '#f9dced')) + 
-  theme_minimal() +
-  theme(axis.title = element_text(size = 11, color = 'gray19'),
-        axis.line = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.text.y = element_text(size = 11, color = 'gray19'),
-        axis.text.x = element_text(size = 8, color = 'gray19', angle=90,hjust=0.95,vjust=0.5),
-        plot.title = element_text(size=13, face="bold", hjust = 0, color = 'gray19'),
-        legend.position = 'bottom', legend.direction = "horizontal") +
-  labs(x = 'Year', y = '% of annual burned standing area', fill="Fire frequency") +
-  annotate('text', x=1, y=110, label = "(a)", size=5) +
-  coord_cartesian(clip='off')
-
-x11(); pSM2
-
-
-# query
-
-# % of standing forests burned multiple times
-sum(subset(df4_std_fq_smf_summary, year=='2021')$perc_burned[2:5]) # 45.7%
-
-
-# saving -----
-
-# as .png
-png("./Figures/SM_Figure1.png",
-    width = 25, height = 11, units = 'cm', res = 400)
-ggarrange(pSM2, pSM, ncol = 2)
-dev.off()
-
-  
