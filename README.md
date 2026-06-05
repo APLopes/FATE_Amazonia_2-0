@@ -1,4 +1,4 @@
-# FATE-SEEG Forest fire emissions model
+# FATE-Amazonia2.0 Forest fire emissions model
 
 This repository supports the scientific publication *“Unveiling the Hidden Greenhouse Gases Footprint of Amazonian Forest Fires”*, submitted to *Nature Communications* in 2025 and led by researchers from INPE and IPAM.
 
