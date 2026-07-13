@@ -32,7 +32,7 @@ library(ggplot2)
 
 
 #load data
-agb_ch = read.csv('./Data/AGB_change/agb_change_allplots_corrected.csv')
+agb_ch = read.csv('/data/AGB_change/agb_change_allplots_corrected.csv')
 
 # remove empty cells
 agb_ch = agb_ch[complete.cases(agb_ch),]
@@ -105,6 +105,6 @@ p1 = ggplot() +
 
 x11(); p1
 
-png("./Figures/Figure2.png", width = 14, height = 10, units = 'cm', res = 300) 
+png("/results/Figures/Figure2.png", width = 14, height = 10, units = 'cm', res = 300) 
 p1
 dev.off()

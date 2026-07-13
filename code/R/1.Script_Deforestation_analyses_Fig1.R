@@ -44,7 +44,7 @@ library(svglite)
 ## Box b - Burned and deforested x all deforested forests ----------------------
 
 # burned and deforested, each-year deforestation area (Km2) ----
-path = './Data/Desf_Fire_freq/burn_desf_area-YYYY'
+path = '/data/Desf_Fire_freq/burn_desf_area-YYYY'
 
 # read all sheets at once and organize 
 
@@ -65,7 +65,7 @@ df_bd = df_bd %>% mutate(cum_burn_defor = cumsum(annual_burn_defor))
 
 
 # burned and standing, cumulative burned area (Km2)
-path = './Data/Desf_Fire_freq/burn_std_for_area-YYYY'
+path = '/data/Desf_Fire_freq/burn_std_for_area-YYYY'
 
 # read all sheets at once and organize 
 
@@ -145,8 +145,8 @@ pb = ggplot() +
 x11(); pb
 
 # exporting tables
-write.xlsx(df_boxb_line, "./Tables/Figure1_boxb_axis1_data.xlsx")
-write.xlsx(df_boxb, "./Tables/Figure1_boxb_axis2_data.xlsx")
+write.xlsx(df_boxb_line, "/results/Tables/Figure1_boxb_axis1_data.xlsx")
+write.xlsx(df_boxb, "/results/Tables/Figure1_boxb_axis2_data.xlsx")
 
 
 # Manuscript statistics ----
@@ -168,7 +168,7 @@ subset(df_boxb, Year == '2021' & Status == 'burned and remain standing')$Area #1
 ## Box c - Fire frequency, standing vs. deforested -----------------------------
 
 # burn frequency when deforested ----
-path = './Data/Desf_Fire_freq/freq_desf-YYYY'
+path = '/data/Desf_Fire_freq/freq_desf-YYYY'
 
 # read all sheets at once and organize 
 
@@ -227,7 +227,7 @@ df3_desf_freq_summary$sd_lo = df3_desf_freq_summary$wg_avg_freq - df3_desf_freq_
 
 # now adding fire frequency for standing forests ----    
 
-path = './Data/Desf_Fire_freq/freq_std-YYYY'
+path = '/data/Desf_Fire_freq/freq_std-YYYY'
 
 # read all sheets at once and organize 
 
@@ -290,13 +290,13 @@ pc_v2 = ggplot(df.freq_bd_bs_summary, aes(x=year,y=wg_avg_freq, group=status, fi
 x11(); pc_v2 # now both 'burned and later deforested' & 'burned and remain standing'
 
 # exporting table
-write.xlsx(df.freq_bd_bs_summary, "./Tables/Figure1_boxc_data.xlsx")
+write.xlsx(df.freq_bd_bs_summary, "/results/Tables/Figure1_boxc_data.xlsx")
 
 
 
 ## Box d - Year since the last fire when deforested ----------------------------
 
-path = './Data/Desf_Fire_freq/ysf_desf-YYYY'
+path = '/data/Desf_Fire_freq/ysf_desf-YYYY'
 
 # read all sheets at once and organize 
 
@@ -332,7 +332,7 @@ df5_desf_ysf_summary$sd_lo = ifelse(df5_desf_ysf_summary$sd_lo < 0, 0, df5_desf_
 
 # now adding ysf for standing forests ----
 
-path = './Data/Desf_Fire_freq/ysf_std_for_area-YYYY'
+path = '/data/Desf_Fire_freq/ysf_std_for_area-YYYY'
 
 # read all sheets at once and organize 
 
@@ -404,7 +404,7 @@ x11(); pd_v2 # now both 'burned and later deforested' & 'burned and remain stand
 
 # exporting table
 
-write.xlsx(df.ysf_bd_bs_summary, "./Tables/Figure1_boxd_data.xlsx")
+write.xlsx(df.ysf_bd_bs_summary, "/results/Tables/Figure1_boxd_data.xlsx")
 
 
 ## queries for the text
@@ -441,7 +441,7 @@ pa = ggplot(null.df) +
 x11(); pa
 
 # as .png
-png("./Figures/Figure1.png",
+png("/results/Figures/Figure1.png",
     width = 25, height = 19.5, units = 'cm', res = 400)
 ggarrange(pa, pb, pc_v2, pd_v2, ncol = 2, nrow = 2, heights = c(2,2))
 dev.off()

@@ -34,7 +34,7 @@ library(egg)
 
 ## load integrated model data --------------------------------------------------
 
-path = './Data/GEE_FireDyn_IntegratedModel_AM_output'
+path = '/data/GEE_FireDyn_IntegratedModel_AM_output'
  
 file.list <- list.files(path = path, full.names = TRUE, recursive = TRUE, pattern = "_Tg_")
 file.list=file.list[!grepl("warning",file.list)]
@@ -128,13 +128,13 @@ pm = ggplot(df.main.fig, aes(Year, Emissions_Tg_Co2eq, fill = GHG, alpha=legacy)
            size = 4, col = gases.pal[1], alpha=0.8, hjust= 0.1, fontface = 'italic')
 x11(); pm
 
-png("./Figures/Figure3.png", width = 20, height = 10, units = 'cm', res = 400)
+png("/results/Figures/Figure3.png", width = 20, height = 10, units = 'cm', res = 400)
 pm
 dev.off()
 
 # exporting table
 write.xlsx(df.main.fig,
-           './Tables/Figure3_data.xlsx')
+           '/results/Tables/Figure3_data.xlsx')
 
 
 # Queries for manuscript text --------------------------------------------------

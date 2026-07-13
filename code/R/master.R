@@ -9,12 +9,12 @@
 # R version: 4.1.2
 
 cat("\n========== Script 1: Deforestation analyses (Fig 1) ==========\n")
-source("R codes/1.Script_Deforestation_analyses_Fig1.R")
+source("code/R/1.Script_Deforestation_analyses_Fig1.R")
 
 cat("\n========== Script 2: AGB change analyses (Fig 2) ==========\n")
-source("R codes/2.Script_AGB_change_analyses_Fig2.R")
+source("code/R/2.Script_AGB_change_analyses_Fig2.R")
 
 cat("\n========== Script 3: GEE model output (Fig 3) ==========\n")
-source("R codes/3.Script_GEE_model_output_Fig3.R")
+source("code/R/3.Script_GEE_model_output_Fig3.R")
 
 cat("\n========== All scripts completed ==========\n")
