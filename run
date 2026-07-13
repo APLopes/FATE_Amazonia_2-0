@@ -4,32 +4,14 @@ set -euo pipefail
 echo "=== FATE-SEEG Reproducible Run ==="
 echo ""
 
-echo "[1/5] Creating output directories..."
+echo "[1/3] Creating output directories..."
 mkdir -p /results/Figures
 mkdir -p /results/Tables
 
-echo "[2/5] Setting up workspace..."
-mkdir -p /code/Data
-mkdir -p /code/Figures
-mkdir -p /code/Tables
-
-echo "[3/5] Copying data into expected location..."
-cp -r /data/* /code/Data/
-
-echo "[4/5] Running master analysis script..."
+echo "[2/3] Running master analysis script..."
 cd /code
-Rscript "R codes/master.R"
+Rscript "code/R/master.R"
 
-echo "[5/5] Collecting results..."
-if ls /code/Figures/*.png 1>/dev/null 2>&1; then
-  cp /code/Figures/*.png /results/Figures/
-  echo "  -> Figures copied."
-fi
-
-if ls /code/Tables/*.xlsx 1>/dev/null 2>&1; then
-  cp /code/Tables/*.xlsx /results/Tables/
-  echo "  -> Tables copied."
-fi
-
+echo "[3/3] Run complete..."
 echo ""
 echo "=== Reproducible Run complete ==="
