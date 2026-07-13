@@ -12,11 +12,11 @@
 // var regen = ee.Image('projects/ee-seeg-brazil/assets/collection_9/v1/1_1_Temporal_filter_regeneration')
 // print(regen, 'regen')
 
-var ysf = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/PRODUTOS_REGIME_DO_FOGO/mapbiomas-fire-collection2-time-after-fire-v1')
+var ysf = ee.Image('projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL02/PRODUTOS_REGIME_DO_FOGO/mapbiomas-fire-collection2-time-after-fire-v1')
 print(ysf, 'ysf')
 // Map.addLayer(ysf, {bands: "classification_2019", palette: 'red'}, "ysf")
 
-var frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-coverage-v1').divide(100).int();
+var frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL02/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-coverage-v1').divide(100).int();
 print(frequence_fire, 'frequence_fire');
 //Map.addLayer(frequence_fire, {bands: 'fire_frequency_1985_2019', palette: ['aaff04','ccff00','fff704','ffbc00','ff5f02','ff1d06']}, 'frequence_fire')
 
@@ -28,7 +28,7 @@ var biomeMask = ee.Image().paint(biome);
 
 var biomesLine = ee.Image().paint(ee.FeatureCollection('users/camilaflorestal/MAPBIOMAS/mb_biomescopy'),'vazio',1);
 
-var statesLine = ee.Image().paint(ee.FeatureCollection('projects/mapbiomas-workspace/AUXILIAR/estados-2017'),'vazio',0.5);
+var statesLine = ee.Image().paint(ee.FeatureCollection('projects/ee-ipam/assets/ORIGINAIS/IBGE/limite_ufs_IBGE_2025'),'vazio',0.5);
 
 var countriesLine = ee.Image().paint(ee.FeatureCollection('projects/mapbiomas-workspace/AUXILIAR/America_do_Sul'),'vazio',2);
 var countriesmask = ee.Image(1).paint(ee.FeatureCollection('projects/mapbiomas-workspace/AUXILIAR/America_do_Sul'));
@@ -139,7 +139,7 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_c10_v_0_29_2019_classification_2019',
   
   
   //Apply correction to ysf dataset - convert fire age at the year of fire to zero
-  var annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1')
+  var annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL02/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1')
                     .selfMask()
                     .multiply(0)
   print(annual_fire, ysf,'annual_fire')

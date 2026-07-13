@@ -19,8 +19,8 @@ var version = 'v2-3'; // commit 11 May 2023 -    from nasa mcd64a1 v6 slice 2001
 
 // --- --- --- ASSETS 
 var time_since_fire = ee.Image('projects/ee-seegfiredyn/assets/internal-version-2023-nasa-mcd64a1-time-after-fire-v1-2002to2023'),
-    // annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').selfMask(),
-    // frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-v1').slice(0,38).divide(100).int(),
+    // annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL02/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').selfMask(),
+    // frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL02/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-coverage-v1').slice(0,38).divide(100).int(),
     // annual_fire_freq_gte2 = annual_fire.updateMask(frequence_fire.gte(2)).gte(1),
 
     fire_collection_reference = ee.ImageCollection('MODIS/061/MCD64A1').select('BurnDate'),
@@ -66,7 +66,7 @@ var time_since_fire = ee.Image('projects/ee-seegfiredyn/assets/internal-version-
     s_inAGBstock = qcn.select('cagb'), // estamos aguardando o CAGB para os outros biomas além da Amazônia
     s_inAGNstock = fwd.add(cwd),
          
-    biomas = ee.FeatureCollection('projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil');
+    biomas = ee.FeatureCollection('projects/ee-ipam/assets/ORIGINAIS/IBGE/limite_biomas_IBGE_2019');
 
 
 print(time_since_fire,annual_fire,frequence_fire,annual_fire_freq_gte2);

@@ -15,9 +15,9 @@
 // --- --- --- VERSION
 var version = 'v2-1-legacy';
 // --- --- --- ASSETS
-var time_since_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/PRODUTOS_REGIME_DO_FOGO/mapbiomas-fire-collection2-time-after-fire-v1'),
-    frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-v1').slice(0,38).divide(100).int(),
-    annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO_COL2/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').selfMask();
+var time_since_fire = ee.Image('projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL02/PRODUTOS_REGIME_DO_FOGO/mapbiomas-fire-collection2-time-after-fire-v1'),
+    frequence_fire = ee.Image('projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL02/SUBPRODUTOS/mapbiomas-fire-collection2-fire-frequency-coverage-v1').slice(0,38).divide(100).int(),
+    annual_fire = ee.Image('projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL02/SUBPRODUTOS/mapbiomas-fire-collection2-annual-burned-coverage-v1').selfMask();
     
 
 // --- SUPPORT DATA LEGACY PROCESS
@@ -54,7 +54,7 @@ var annual_fire_freq_gte2 = annual_fire.updateMask(frequence_fire.gte(2)).gte(1)
     s_inAGBstock = qcn.select('cagb'), // estamos aguardando o CAGB para os outros biomas além da Amazônia
     s_inAGNstock = fwd.add(cwd),
          
-    biomas = ee.FeatureCollection('projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil');
+    biomas = ee.FeatureCollection('projects/ee-ipam/assets/ORIGINAIS/IBGE/limite_biomas_IBGE_2019');
     
 // Map.addLayer(time_since_fire,{},'time_since_fire');
 // Map.addLayer(frequence_fire,{},'frequence_fire');

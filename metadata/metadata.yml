@@ -1,0 +1,33 @@
+name: "FATE-SEEG Forest Fire Emissions Model"
+description: >
+  Computational capsule supporting the scientific publication
+  "Unveiling the Hidden Greenhouse Gases Footprint of Amazonian Forest Fires",
+  submitted to Nature Communications (2025).
+  Contains R workflows for greenhouse gas emissions calculations,
+  statistical analyses, and figure generation.
+  Part of the SEEG Fire Platform (INPE/IPAM).
+
+research_field: "Environmental Sciences"
+
+authors:
+  - name: "Camila Silva"
+    email: "camila.silva@ipam.org.br"
+  - name: "Aline Pontes"
+    email: "alineplopes@gmail.com"
+  - name: "Wallace Silva"
+    email: "wallace.silva@ipam.org.br"
+  - name: "Celso H. L. Silva-Junior"
+    email: "celso.junior@ipam.org.br"
+
+tags:
+  - "Amazon"
+  - "forest-fires"
+  - "greenhouse-gases"
+  - "carbon-emissions"
+  - "deforestation"
+  - "SEEG"
+  - "FATE-model"
+
+institutions:
+  - "INPE — National Institute for Space Research"
+  - "IPAM — Amazon Environmental Research Institute"
