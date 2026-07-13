@@ -18,7 +18,7 @@ var ysf = ee.Image('projects/ee-seegfiredyn/assets/mapbiomas-fire-collection1-ye
 // print(ysf, 'ysf')
 // Map.addLayer(ysf, {bands: "classification_2019", palette: 'red'}, "ysf")
 
-var frequence_fire = ee.Image('projects/mapbiomas-workspace/public/collection6/mapbiomas-fire-collection1-fire-frequency-1').divide(100).int();
+var frequence_fire = ee.Image('projects/mapbiomas-public/assets/brazil/lulc/collection6/mapbiomas-fire-collection1-fire-frequency-1').divide(100).int();
 // print(frequence_fire, 'frequence_fire');
 //Map.addLayer(frequence_fire, {bands: 'fire_frequency_1985_2019', palette: ['aaff04','ccff00','fff704','ffbc00','ff5f02','ff1d06']}, 'frequence_fire')
 
@@ -74,7 +74,7 @@ var reg = ms_subtr.eq(1).selfMask();
 
 //Calculate the area of regeneration pixels (inconsistency in the data) and export results in a table
 var bioma = 'amazonia';
-var biome = ee.FeatureCollection('projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil')
+var biome = ee.FeatureCollection('projects/ee-ipam/assets/ORIGINAIS/IBGE/limite_biomas_IBGE_2019')
 .filter(ee.Filter.eq('Bioma','Amazônia'))
 
 reg.bandNames().evaluate(function(bandnames){
@@ -137,7 +137,7 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_2021_c6_2019_classification_2019', pa
   
   
   //Apply correction to ysf dataset - convert fire age at the year of fire to zero
-  var annual_fire = ee.Image('projects/mapbiomas-workspace/public/collection6/mapbiomas-fire-collection1-annual-burned-coverage-1')
+  var annual_fire = ee.Image('projects/mapbiomas-public/assets/brazil/lulc/collection6/mapbiomas-fire-collection1-annual-burned-coverage-1')
                     .slice(1)
                     .selfMask()
                     .multiply(0)
@@ -333,7 +333,7 @@ Map.addLayer(mask_stable_cor, {bands:'SEEG_2021_c6_2019_classification_2019', pa
   var all_ysf_std_for_area = ysf_adap.updateMask(mask_stable_cor.select('SEEG_2021_c6_2020_classification_2020'))
     .reduce('sum');
   
-  var grid = ee.FeatureCollection('projects/ee-seegfiredyn/assets/10grid')
+  var grid = ee.FeatureCollection('projects/ee-ipam/assets/SEEG/SEEG13/10grid')
     .map(function(feature){
       
       var ysf_desf_area = ee.Image.pixelArea().divide(1e6).updateMask(all_ysf_desf.gte(1))
