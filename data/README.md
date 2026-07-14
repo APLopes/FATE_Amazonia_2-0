@@ -74,4 +74,4 @@ All datasets derived from:
 
 ## License
 
-`LICENSE-CC0` --- CC0 1.0 Universal. Applies to all data files in this directory.
+`LICENSE` --- CC0 1.0 Universal. Applies to all data files in this directory.
