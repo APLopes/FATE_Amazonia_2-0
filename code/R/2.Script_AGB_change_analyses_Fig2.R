@@ -103,7 +103,7 @@ p1 = ggplot() +
   labs(y="Net cumulative C change (%)", x='Time since fire (years)',
        color='Brazilian state')
 
-x11(); p1
+p1
 
 png("/results/Figures/Figure2.png", width = 14, height = 10, units = 'cm', res = 300) 
 p1

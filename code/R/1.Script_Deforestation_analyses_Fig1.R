@@ -142,7 +142,7 @@ pb = ggplot() +
   labs(x = 'Year', y = '% of cumulated burned standing forest', fill="", alpha="") + 
   annotate('text', x='1991', y=386000, label = "(b)", size=5)
 
-x11(); pb
+pb
 
 # exporting tables
 write.xlsx(df_boxb_line, "/results/Tables/Figure1_boxb_axis1_data.xlsx")
@@ -287,7 +287,7 @@ pc_v2 = ggplot(df.freq_bd_bs_summary, aes(x=year,y=wg_avg_freq, group=status, fi
   labs(x = 'Year', y = "Fire frequency", fill="", color="") +
   annotate('text', x=1991, y=3.9, label = "(c)", size=5)
 
-x11(); pc_v2 # now both 'burned and later deforested' & 'burned and remain standing'
+pc_v2 # now both 'burned and later deforested' & 'burned and remain standing'
 
 # exporting table
 write.xlsx(df.freq_bd_bs_summary, "/results/Tables/Figure1_boxc_data.xlsx")
@@ -399,7 +399,7 @@ pd_v2 = ggplot(df.ysf_bd_bs_summary, aes(x=year,y=wg_avg_ysf, group=status, fill
   labs(x = 'Year', y = "Time since last fire (years)", fill="", color="") +
   annotate('text', x=1991, y=20.8, label = "(d)", size=5)
 
-x11(); pd_v2 # now both 'burned and later deforested' & 'burned and remain standing'
+pd_v2 # now both 'burned and later deforested' & 'burned and remain standing'
 
 
 # exporting table
@@ -438,7 +438,7 @@ pa = ggplot(null.df) +
   annotate('text', x='1991', y=240, label = "(a)", size=5) +
   coord_cartesian(ylim=c(1,250))
 
-x11(); pa
+pa
 
 # as .png
 png("/results/Figures/Figure1.png",
