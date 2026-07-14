@@ -14,6 +14,7 @@ Versioned alongside the code as reference artifacts.
 | `figures/Figure1.png` | Figure 1 Boxes b-d --- Deforestation of burned forests | Script 1 |
 | `figures/Figure2.png` | Figure 2 --- AGB change following fire | Script 2 |
 | `figures/Figure3.png` | Figure 3 --- GHG emissions from forest fires | Script 3 |
+| `figures/Figure4.png` | Supplementary figure | Pre-rendered |
 | `tables/Figure1_boxb_axis1_data.xlsx` | Source data --- Figure 1 Box b | Script 1 |
 | `tables/Figure1_boxb_axis2_data.xlsx` | Source data --- Figure 1 Box b | Script 1 |
 | `tables/Figure1_boxc_data.xlsx` | Source data --- Figure 1 Box c | Script 1 |
