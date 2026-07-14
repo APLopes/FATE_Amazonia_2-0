@@ -1,4 +1,4 @@
-# FATE-Amazonia2.0 — Forest fire emissions model
+# FATE-Amazonia2.0 Forest fire emissions model
 
 This repository supports the scientific publication *"Unveiling the Hidden
 Greenhouse Gases Footprint of Amazonian Forest Fires"*, submitted to *Nature
@@ -27,10 +27,15 @@ incorporated into the SEEG Fire Platform.
 
 ## Files
 
-### Code
-R scripts for figure generation (Figures 1–3) and the master orchestration
-script (`master.R`) for reproducible execution. GEE JavaScript scripts
-implementing the FATE spatial model and figure data extraction.
+- **`code/R/`** — R scripts for figure generation (Figures 1–3) and the
+  master orchestration script (`master.R`).
+- **`code/GEE/`** — Google Earth Engine JavaScript scripts implementing the
+  FATE spatial model and figure data extraction.
+- **`data/`** — Input datasets: field inventory (AGB change),
+  deforestation and fire frequency statistics (1990–2021), and FATE model
+  emissions outputs. Pre-rendered reference figures in `data/figures/`.
+- **`results/`** — Output directory. Figures (PNG) and source data tables
+  (XLSX) are generated here during execution.
 
 R packages: `data.table`, `openxlsx`, `dplyr`, `reshape2`, `tidyr`, `ggplot2`,
 `scales`, `egg`, `svglite`, `plyr`, `viridis`.
