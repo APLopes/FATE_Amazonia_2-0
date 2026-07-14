@@ -2,7 +2,7 @@
 
 This repository supports the scientific publication *"Unveiling the Hidden
 Greenhouse Gases Footprint of Amazonian Forest Fires"*, submitted to *Nature
-Communications* in 2025 and led by researchers from INPE and IPAM.
+Communications* in 2025 (currently under review) and led by researchers from INPE and IPAM.
 
 The repository contains:
 
