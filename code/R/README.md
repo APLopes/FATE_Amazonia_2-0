@@ -26,7 +26,7 @@ correct order.
 | Years-since-fire --- standing | `/data/Desf_Fire_freq/ysf_std_for_area-YYYY/` | Script 1 |
 | AGB change field measurements | `/data/AGB_change/agb_change_allplots_corrected.csv` | Script 2 |
 | FATE model emissions output | `/data/GEE_FireDyn_IntegratedModel_AM_output/` | Script 3 |
-| Figure 1 Box a — Burned area map (2020) | `/data/Figure1_map.jpg` | Pre-rendered (GEE `Paper_fig1_map.js`) |
+| Figure 1 Box a — Burned area map (2020) | `/data/figures/Figure1_map.jpg` | Pre-rendered (GEE `Paper_fig1_map.js`) |
 
 ## Outputs
 
