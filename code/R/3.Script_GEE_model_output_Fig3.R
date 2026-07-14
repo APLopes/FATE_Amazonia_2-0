@@ -126,10 +126,8 @@ pm = ggplot(df.main.fig, aes(Year, Emissions_Tg_Co2eq, fill = GHG, alpha=legacy)
        y = expression("Greenhouse gas emissions (Tg CO"[2]*"eq year"^{-1}*')')) + 
   annotate(geom = 'text', x='2024', y=70, label='Legacy from tree mortality',
            size = 4, col = gases.pal[1], alpha=0.8, hjust= 0.1, fontface = 'italic')
-pm
-
 png("/results/Figures/Figure3.png", width = 20, height = 10, units = 'cm', res = 400)
-pm
+print(pm)
 dev.off()
 
 # exporting table
