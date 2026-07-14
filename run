@@ -2,5 +2,6 @@
 set -ex
 
 export R_DONT_USE_X11=1
+mkdir -p /results/Figures /results/Tables
 
 Rscript R/master.R "$@"
