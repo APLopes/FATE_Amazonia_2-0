@@ -8,6 +8,8 @@
 #
 # R version: 4.1.2
 
+options(bitmapType = "cairo")
+
 cat("\n========== Script 1: Deforestation analyses (Fig 1) ==========\n")
 source("R/1.Script_Deforestation_analyses_Fig1.R")
 
